@@ -1,6 +1,8 @@
 package com.fiap.techchallenge.streamingtech.usecase;
 
 import com.fiap.techchallenge.streamingtech.model.Video;
+import com.fiap.techchallenge.streamingtech.model.VideoStats;
+import com.fiap.techchallenge.streamingtech.repository.UserRepository;
 import com.fiap.techchallenge.streamingtech.repository.VideoRepository;
 import com.fiap.techchallenge.streamingtech.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +13,15 @@ import reactor.core.publisher.Mono;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class VideoServiceImpl implements VideoService {
 
     private final VideoRepository videoRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Mono<Video> createVideo(Video video) {
@@ -71,6 +76,35 @@ public class VideoServiceImpl implements VideoService {
                 .flatMap(video -> {
                     video.setAverageViews(video.getAverageViews() + 1);
                     return videoRepository.save(video);
+                });
+    }
+
+    public Mono<VideoStats> getVideoStats() {
+        Mono<Long> totalVideos = videoRepository.count();
+        Mono<Long> favoritedVideos = userRepository.countByFavoriteVideosIsNotNull();
+        Flux<Video> allVideos = videoRepository.findAll();
+
+        return Mono.zip(totalVideos, favoritedVideos, calculateAverageViews(allVideos))
+                .map(tuple -> new VideoStats(tuple.getT1(), tuple.getT2(), tuple.getT3()));
+    }
+
+    private Mono<Double> calculateAverageViews(Flux<Video> videos) {
+        return videos
+                .map(Video::getAverageViews)
+                .reduce(0L, Long::sum)
+                .map(totalViews -> totalViews / (double) videos.count().block());
+    }
+
+    public Flux<Video> getRecommendedVideos(String userId) {
+        return userRepository.findById(userId)
+                .flatMapMany(user -> {
+                    List<String> favoriteVideoIds = user.getFavoriteVideos().stream()
+                            .map(Video::getId)
+                            .collect(Collectors.toList());
+                    return videoRepository.findByCategoriesInAndIdNotIn(user.getFavoriteVideos().stream()
+                                    .flatMap(video -> video.getCategories().stream())
+                                    .collect(Collectors.toList()), favoriteVideoIds)
+                            .take(10);
                 });
     }
 

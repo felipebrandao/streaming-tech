@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.streamingtech.controller;
 
 import com.fiap.techchallenge.streamingtech.model.Video;
+import com.fiap.techchallenge.streamingtech.model.VideoStats;
 import com.fiap.techchallenge.streamingtech.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -52,5 +53,15 @@ public class VideoController {
     @GetMapping("/{id}")
     public Mono<Video> getVideoWithIncrementedViews(@PathVariable String id) {
         return videoService.getVideoWithIncrementedViews(id);
+    }
+
+    @GetMapping("/stats")
+    public Mono<VideoStats> getVideoStats() {
+        return videoService.getVideoStats();
+    }
+
+    @GetMapping("/recommended/{userId}")
+    public Flux<Video> getRecommendedVideos(@PathVariable String userId) {
+        return videoService.getRecommendedVideos(userId);
     }
 }

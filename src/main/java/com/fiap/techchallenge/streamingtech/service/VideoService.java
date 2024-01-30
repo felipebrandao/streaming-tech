@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.streamingtech.service;
 
 import com.fiap.techchallenge.streamingtech.model.Video;
+import com.fiap.techchallenge.streamingtech.model.VideoStats;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,4 +15,6 @@ public interface VideoService {
     Flux<Video> getVideosByTitleAndDate(String title, String date) throws ParseException;
     Flux<Video> getVideosByCategory(String category);
     Mono<Video> getVideoWithIncrementedViews(String id);
+    Mono<VideoStats> getVideoStats();
+    Flux<Video> getRecommendedVideos(String userId);
 }
