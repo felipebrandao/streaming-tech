@@ -1,8 +1,10 @@
 package com.fiap.techchallenge.streamingtech.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class VideoStats {
     private long totalVideos;
     private long favoritedVideos;
