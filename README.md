@@ -12,6 +12,7 @@
 | **📋 Testes**             | Testes Unitários e de Integração                                                                                                                                                                                      |
 | **🔗 Controle de Versão** | [Git (GitHub)](https://github.com/)                                                                                                                                                                                   |
 | **📜 Documentação**       | [Swagger](https://swagger.io/)                                                                                                                                                                                        |
+| **🐳 Docker**             | [Docker](https://www.docker.com/)                                                                                                                                                                                     |
 
 ## Desafios Encontrados
 
