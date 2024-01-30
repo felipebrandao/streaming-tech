@@ -51,7 +51,6 @@ class VideoServiceTest {
         updatedVideo.setUrl("https://www.updated-url.com");
         updatedVideo.setPublicationDate(LocalDate.now());
         updatedVideo.setCategories(List.of("Nova Categoria"));
-        updatedVideo.setFavorite(true);
 
         when(videoRepository.findById(anyString())).thenReturn(Mono.just(updatedVideo));
         when(videoRepository.save(any(Video.class))).thenReturn(Mono.just(updatedVideo));
@@ -83,9 +82,9 @@ class VideoServiceTest {
 
     @Test
     void getAllVideos_Success() {
-        Video video1 = new Video("id1", "Video 1", "Descrição 1", "https://www.example.com/1", LocalDate.now(), Arrays.asList("Categoria 1", "Categoria 2"), false);
-        Video video2 = new Video("id2", "Video 2", "Descrição 2", "https://www.example.com/2", LocalDate.now().minusDays(1), Arrays.asList("Categoria 1"), true);
-        Video video3 = new Video("id3", "Video 3", "Descrição 3", "https://www.example.com/3", LocalDate.now().minusDays(2), Arrays.asList("Categoria 2"), false);
+        Video video1 = new Video("id1", "Video 1", "Descrição 1", "https://www.example.com/1", LocalDate.now(), Arrays.asList("Categoria 1", "Categoria 2"), 1L);
+        Video video2 = new Video("id2", "Video 2", "Descrição 2", "https://www.example.com/2", LocalDate.now().minusDays(1), List.of("Categoria 1"), 2L);
+        Video video3 = new Video("id3", "Video 3", "Descrição 3", "https://www.example.com/3", LocalDate.now().minusDays(2), List.of("Categoria 2"), 3L);
 
         when(videoRepository.findAll()).thenReturn(Flux.just(video1, video2, video3));
 
@@ -116,8 +115,8 @@ class VideoServiceTest {
     void getVideosByTitleAndDate_Success() throws ParseException {
         String title = "exampleTitle";
         String date = "2022-01-01";
-        Video video1 = new Video("id1", title, "description1", "url1", LocalDate.parse(date), Arrays.asList("category1"), false);
-        Video video2 = new Video("id2", title, "description2", "url2", LocalDate.parse(date).plusDays(1), Arrays.asList("category2"), true);
+        Video video1 = new Video("id1", title, "description1", "url1", LocalDate.parse(date), List.of("category1"), 1L);
+        Video video2 = new Video("id2", title, "description2", "url2", LocalDate.parse(date).plusDays(1), List.of("category2"), 2L);
 
         when(videoRepository.findByTitleContainingIgnoreCaseAndPublicationDateAfter(eq(title), any())).thenReturn(Flux.just(video1, video2));
 
@@ -133,8 +132,8 @@ class VideoServiceTest {
     @Test
     void getVideosByCategory_Success() {
         String category = "exampleCategory";
-        Video video1 = new Video("id1", "title1", "description1", "url1", LocalDate.now(), Arrays.asList(category), false);
-        Video video2 = new Video("id2", "title2", "description2", "url2", LocalDate.now().plusDays(1), Arrays.asList(category), true);
+        Video video1 = new Video("id1", "title1", "description1", "url1", LocalDate.now(), List.of(category), 1L);
+        Video video2 = new Video("id2", "title2", "description2", "url2", LocalDate.now().plusDays(1), List.of(category), 2L);
 
         when(videoRepository.findByCategoriesContaining(eq(category))).thenReturn(Flux.just(video1, video2));
 
@@ -146,5 +145,4 @@ class VideoServiceTest {
 
         verify(videoRepository, times(1)).findByCategoriesContaining(eq(category));
     }
-
 }
