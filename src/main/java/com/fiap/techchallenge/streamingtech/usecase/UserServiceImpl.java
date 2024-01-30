@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.streamingtech.usecase;
 
 import com.fiap.techchallenge.streamingtech.model.User;
+import com.fiap.techchallenge.streamingtech.model.Video;
 import com.fiap.techchallenge.streamingtech.repository.UserRepository;
 import com.fiap.techchallenge.streamingtech.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +28,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<User> updateUserFavoriteVideos(String id, User user) {
-        return userRepository.findById(id)
-                .flatMap(existingUser -> {
-                    existingUser.setFavoriteVideos(user.getFavoriteVideos());
-                    return userRepository.save(existingUser);
-                });
-    }
-
-    @Override
     public Mono<User> getUserById(String id) {
         return userRepository.findById(id);
     }
@@ -43,5 +35,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<Void> deleteUser(String id) {
         return userRepository.deleteById(id).then();
+    }
+
+    @Override
+    public Mono<User> addVideoToFavorites(String userId, Video video) {
+        return userRepository.findById(userId)
+                .flatMap(user -> {
+                    user.addFavoriteVideo(video);
+                    return userRepository.save(user);
+                });
     }
 }

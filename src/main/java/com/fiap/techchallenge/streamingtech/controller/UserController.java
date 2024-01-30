@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.streamingtech.controller;
 
 import com.fiap.techchallenge.streamingtech.model.User;
+import com.fiap.techchallenge.streamingtech.model.Video;
 import com.fiap.techchallenge.streamingtech.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +40,6 @@ public class UserController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}/updateFavoriteVideos")
-    public Mono<ResponseEntity<User>> updateUserFavoriteVideos(@PathVariable String id, @RequestBody User user) {
-        return userService.updateUserFavoriteVideos(id, user)
-                .map(updatedUser -> ResponseEntity.ok().body(updatedUser))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
     @GetMapping("/{id}")
     public Mono<ResponseEntity<User>> getUserById(@PathVariable String id) {
         return userService.getUserById(id)
@@ -57,6 +51,16 @@ public class UserController {
     public Mono<ResponseEntity<Void>> deleteUser(@PathVariable String id) {
         return userService.deleteUser(id)
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{userId}/addFavoriteVideo")
+    public Mono<ResponseEntity<User>> addVideoToFavorites(
+            @PathVariable String userId,
+            @RequestBody Video video
+    ) {
+        return userService.addVideoToFavorites(userId, video)
+                .map(updatedUser -> ResponseEntity.ok().body(updatedUser))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

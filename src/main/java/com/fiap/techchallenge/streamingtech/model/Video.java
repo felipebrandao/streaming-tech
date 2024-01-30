@@ -21,5 +21,5 @@ public class Video {
     private String url;
     private LocalDate publicationDate;
     private List<String> categories;
-    private boolean isFavorite;
+    private Long averageViews = 0L;
 }

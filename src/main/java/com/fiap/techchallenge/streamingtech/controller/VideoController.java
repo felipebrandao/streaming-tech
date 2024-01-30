@@ -1,7 +1,6 @@
 package com.fiap.techchallenge.streamingtech.controller;
 
 import com.fiap.techchallenge.streamingtech.model.Video;
-import com.fiap.techchallenge.streamingtech.model.VideoStats;
 import com.fiap.techchallenge.streamingtech.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -39,10 +38,6 @@ public class VideoController {
         return videoService.deleteVideo(id);
     }
 
-    @PutMapping("/{id}/favorite")
-    public Mono<Video> markAsFavorite(@PathVariable String id, @RequestParam boolean isFavorite) {
-        return videoService.markAsFavorite(id, isFavorite);
-    }
 
     @GetMapping("/search")
     public Flux<Video> getVideosByTitleAndDate(@RequestParam String title, @RequestParam String date) throws ParseException {
@@ -54,13 +49,8 @@ public class VideoController {
         return videoService.getVideosByCategory(category);
     }
 
-    @GetMapping("/recommended")
-    public Flux<Video> getRecommendedVideos(@RequestParam String userId) {
-        return videoService.getRecommendedVideos(userId);
-    }
-
-    @GetMapping("/stats")
-    public Mono<VideoStats> getVideoStatistics() {
-        return videoService.getVideoStatistics();
+    @GetMapping("/{id}")
+    public Mono<Video> getVideoWithIncrementedViews(@PathVariable String id) {
+        return videoService.getVideoWithIncrementedViews(id);
     }
 }

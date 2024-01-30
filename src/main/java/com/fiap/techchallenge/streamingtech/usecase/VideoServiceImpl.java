@@ -1,9 +1,6 @@
 package com.fiap.techchallenge.streamingtech.usecase;
 
-import com.fiap.techchallenge.streamingtech.model.User;
 import com.fiap.techchallenge.streamingtech.model.Video;
-import com.fiap.techchallenge.streamingtech.model.VideoStats;
-import com.fiap.techchallenge.streamingtech.repository.UserRepository;
 import com.fiap.techchallenge.streamingtech.repository.VideoRepository;
 import com.fiap.techchallenge.streamingtech.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +18,6 @@ public class VideoServiceImpl implements VideoService {
 
     private final VideoRepository videoRepository;
 
-    private final UserRepository userRepository;
-
     @Override
     public Mono<Video> createVideo(Video video) {
         return videoRepository.save(video);
@@ -37,7 +32,6 @@ public class VideoServiceImpl implements VideoService {
                     existingVideo.setUrl(video.getUrl());
                     existingVideo.setPublicationDate(video.getPublicationDate());
                     existingVideo.setCategories(video.getCategories());
-                    existingVideo.setFavorite(video.isFavorite());
                     return videoRepository.save(existingVideo);
                 });
     }
@@ -59,32 +53,7 @@ public class VideoServiceImpl implements VideoService {
         return videoRepository.deleteById(id).then();
     }
 
-    @Override
-    public Mono<Video> markAsFavorite(String id, boolean isFavorite, String userId) {
-        return userRepository.findById(userId)
-                .flatMap(user -> {
-                    if (isFavorite) {
-                        user.getFavoriteVideos().add(id);
-                    } else {
-                        user.getFavoriteVideos().remove(id);
-                    }
-                    return userRepository.save(user);
-                })
-                .then(videoRepository.findById(id))
-                .flatMap(video -> {
-                    video.setFavorite(isFavorite);
-                    return videoRepository.save(video);
-                });
-    }
 
-    @Override
-    public Mono<Video> markAsFavorite(String id, boolean isFavorite) {
-        return videoRepository.findById(id)
-                .flatMap(video -> {
-                    video.setFavorite(isFavorite);
-                    return videoRepository.save(video);
-                });
-    }
 
     @Override
     public Flux<Video> getVideosByTitleAndDate(String title, String date) throws ParseException {
@@ -97,21 +66,12 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public Flux<Video> getRecommendedVideos(String userId) {
-        return getUserFavoriteVideos(userId)
-                .flatMap(video -> getVideosByCategory(video.getCategories().get(0)))
-                .distinct();
-    }
-
-    @Override
-    public Mono<VideoStats> getVideoStatistics() {
-        return null;
-    }
-
-    private Flux<Video> getUserFavoriteVideos(String userId) {
-        return userRepository.findById(userId)
-                .map(User::getFavoriteVideos)
-                .flatMapMany(videoRepository::findAllById);
+    public Mono<Video> getVideoWithIncrementedViews(String id) {
+        return videoRepository.findById(id)
+                .flatMap(video -> {
+                    video.setAverageViews(video.getAverageViews() + 1);
+                    return videoRepository.save(video);
+                });
     }
 
     private Date parseDate(String date) throws ParseException {

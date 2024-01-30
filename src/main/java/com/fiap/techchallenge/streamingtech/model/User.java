@@ -17,10 +17,14 @@ public class User {
 
     private String username;
     private String password;
-    private List<String> favoriteVideos;
+    private List<Video> favoriteVideos;
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public void addFavoriteVideo(Video video) {
+        this.favoriteVideos.add(video);
     }
 }
