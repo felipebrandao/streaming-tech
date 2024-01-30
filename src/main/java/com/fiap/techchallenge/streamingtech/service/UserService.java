@@ -9,5 +9,5 @@ public interface UserService {
     Mono<User> updateUserPassword(String id, User user);
     Mono<User> getUserById(String id);
     Mono<Void> deleteUser(String id);
-    Mono<User> addVideoToFavorites(String userId, Video video)
+    Mono<User> addVideoToFavorites(String userId, Video video);
 }
