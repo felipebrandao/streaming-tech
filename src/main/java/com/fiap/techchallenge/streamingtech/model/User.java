@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document
@@ -17,7 +18,7 @@ public class User {
 
     private String username;
     private String password;
-    private List<Video> favoriteVideos;
+    private List<Video> favoriteVideos = new ArrayList<>();
 
     public User(String username, String password) {
         this.username = username;
