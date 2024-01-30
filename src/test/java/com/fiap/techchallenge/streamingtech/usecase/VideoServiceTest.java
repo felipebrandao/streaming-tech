@@ -1,6 +1,8 @@
 package com.fiap.techchallenge.streamingtech.usecase;
 
 import com.fiap.techchallenge.streamingtech.model.Video;
+import com.fiap.techchallenge.streamingtech.model.VideoStats;
+import com.fiap.techchallenge.streamingtech.repository.UserRepository;
 import com.fiap.techchallenge.streamingtech.repository.VideoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,9 @@ class VideoServiceTest {
 
     @Mock
     private VideoRepository videoRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private VideoServiceImpl videoService;
@@ -145,4 +150,24 @@ class VideoServiceTest {
 
         verify(videoRepository, times(1)).findByCategoriesContaining(eq(category));
     }
+
+    @Test
+    void getVideoWithIncrementedViews_Success() {
+        Video video = new Video();
+        video.setId("id123");
+        video.setAverageViews(0L);
+
+        when(videoRepository.findById("id123")).thenReturn(Mono.just(video));
+        when(videoRepository.save(any(Video.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        Mono<Video> result = videoService.getVideoWithIncrementedViews("id123");
+
+        StepVerifier.create(result)
+                .expectNextMatches(updatedVideo -> updatedVideo.getAverageViews() == 1)
+                .verifyComplete();
+
+        verify(videoRepository, times(1)).findById("id123");
+        verify(videoRepository, times(1)).save(any(Video.class));
+    }
+
 }
